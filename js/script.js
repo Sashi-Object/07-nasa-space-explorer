@@ -10,6 +10,8 @@ const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalExplanation = document.getElementById('modalExplanation');
 const closeModalButton = document.getElementById('closeModalButton');
+const modalContent = document.querySelector('.modal-content');
+let savedPageScrollY = 0;
 
 const API_KEY = 'xz45LLFFb5BpSsV3xWU4rlDFUQsCclgMfyzr2hMW';
 const APOD_BASE_URL = 'https://api.nasa.gov/planetary/apod';
@@ -44,8 +46,20 @@ function createGalleryCard(item) {
 		modalTitle.textContent = item.title;
 		modalDate.textContent = item.date;
 		modalExplanation.textContent = item.explanation;
+		savedPageScrollY = window.scrollY;
 		modal.classList.add('open');
 		document.body.classList.add('modal-open');
+		document.body.style.position = 'fixed';
+		document.body.style.top = `-${savedPageScrollY}px`;
+		document.body.style.left = '0';
+		document.body.style.right = '0';
+		// Reset scroll after opening so long content is fully reachable.
+		requestAnimationFrame(() => {
+			modal.scrollTop = 0;
+			if (modalContent) {
+				modalContent.scrollTop = 0;
+			}
+		});
 	});
 
 	return card;
@@ -54,6 +68,15 @@ function createGalleryCard(item) {
 function closeModal() {
 	modal.classList.remove('open');
 	document.body.classList.remove('modal-open');
+	document.body.style.position = '';
+	document.body.style.top = '';
+	document.body.style.left = '';
+	document.body.style.right = '';
+	window.scrollTo(0, savedPageScrollY);
+	modal.scrollTop = 0;
+	if (modalContent) {
+		modalContent.scrollTop = 0;
+	}
 }
 
 async function getSpaceImages() {
